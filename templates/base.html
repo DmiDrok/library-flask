@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %}
+        <title>Сайт</title>
+    {% endif %}
+
+    <meta name="viewport" content="width=device-width">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles/styles.css') }}">
+    <link rel="icon" href="{{ url_for('static', filename='img/logo.png') }}">
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>Библиотека <i>Марксизма</i></h1>
+        </div>
+
+        <nav>
+            {% if links %}
+                <a href="{{ url_for('index') }}" class="nav_link {{ links[url_for('index')] }}">Главная</a>
+                <a href="{{ url_for('all_authors') }}" class="nav_link {{ links[url_for('all_authors')] }}">Все авторы</a>
+                <a href="{{ url_for('about') }}" class="nav_link {{ links[url_for('about')] }}"}>О сайте</a>
+            {% else %}
+                <a href="{{ url_for('index') }}" class="nav_link">Главная</a>
+                <a href="{{ url_for('all_authors') }}" class="nav_link">Все авторы</a>
+                <a href="{{ url_for('about') }}" class="nav_link">О сайте</a>
+            {% endif %}
+
+            <div class="burger_menu">
+                <i class="burger_line"></i>
+                <i class="burger_line"></i>
+                <i class="burger_line"></i>
+
+                <div class="nav_burger">
+                    <a href="{{ url_for('index') }}">Главная</a>
+                    <a href="{{ url_for('all_authors') }}">Все авторы</a>
+                    <a href="{{ url_for('about') }}">О сайте</a>
+                </div>
+            </div>
+        </nav>
+
+        <div class="btns_header">
+            {% if links %}
+                <a href="{{ url_for('auth') }}" id="auth" class="{{ links[url_for('auth')] }}">Авторизация</a>
+                <a href="{{ url_for('register') }}" id="register" class="{{ links[url_for('register')] }}">Регистрация</a>
+            {% else %}
+                <a href="{{ url_for('auth') }}" id="auth">Авторизация</a>
+                <a href="{{ url_for('register') }}" id="register">Регистрация</a>
+            {% endif %}
+        </div>
+    </header>
+
+    <section class="content_block">
+        {% block content %}
+        {% endblock %}
+    </section>
+
+    <script src="{{ url_for('static', filename='javascript/js.js') }}"></script>
+</body>
+</html>

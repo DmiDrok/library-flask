@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+{{ super() }}
+
+<div class="title_content">
+    <h2 class="smaller_title">
+        <a href="{{ url_for('all_authors') }}">Все авторы</a> --> <a href="{{ url_for('author_page', author_url=author.url) }}">{{ author.fullname }}</a> --> {{ book.title }}
+    </h2>
+
+    <div class="chapters_here">
+        {% for chapter in chapters %}
+            <div class="chapter">
+                <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5] }}</a>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
