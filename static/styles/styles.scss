@@ -15,13 +15,14 @@ $color_btn: #d8131d;
 body{
     display: grid;
     font-family: 'Charis SIL', serif;
-    min-width: 653px;
+    min-width: 670px;
     overflow-x: hidden;
 
     .content_block{
-        width: 80%;
+        min-width: 80%;
+        max-width: 90%;
         justify-self: center;
-        margin-top: 2rem;
+        margin: 2rem 0 1rem 0;
 
         h2:first-child{
             font-size: 30px;
@@ -82,6 +83,7 @@ body{
                 color: #fff;
                 background-color: #2caa50;
                 border: 1px solid #141414;
+                padding: 5px 10px;
             }
 
             #close_flash_msg{
@@ -286,7 +288,7 @@ header{
             color: #000;
         }
 
-        #register.active::before{
+        #register.active::before, #favourites.active::before{
             width: 100%;
         }
 
@@ -307,15 +309,17 @@ header{
             background-color: #fff;
         }
 
-        #register{
+        #register, #favourites{
             border: 2px solid #ed315a;
             box-shadow: 0 0 1px 1px rgba(237, 49, 90, 1);
             z-index: 100;
         }
 
-        #register::before{
+        #register::before, #favourites::before{
             background-color: #ed315a;
         }
+
+
     }
 
     a{
@@ -414,14 +418,97 @@ header{
 .content_block .books_here{
     margin-top: 1rem;
     font-size: 18px;
+    position: relative;
 
-    a{
-        color: #000;
-        text-decoration: underline;
+    /*Кнопка сохранения в избранное*/
+    .btn_save{
+        position: absolute;
+        right: 15px;
+        top: 15px;
+
+        #save_favourites{
+            font-size: 15px;
+            padding: 5px;
+            background: none;
+            border: 2px solid #ed315a;
+            box-shadow: 0 0 1px 1px rgba(237, 49, 90, .1);
+            font-size: 18px;
+            font-family: 'Charis SIL', serif;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 2px;
+            position: relative;
+            transition-duration: .2s;
+            z-index: 100;
+        }
+
+        #save_favourites::before{
+            content: "";
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            height: 100%;
+            width: 0;
+            background-color: #ed315a;
+            transition-duration: .3s;
+            display: block;
+            z-index: -1;
+        }
+        
+        #save_favourites:hover{
+            color: #fff;
+        }
+
+        #save_favourites:hover::before{
+            width: 100%;
+        }
+
+        #save_favourites:active{
+            border-color: 2px solid #d8131d;
+        }
+
+        #save_favourites:active::before{
+            background-color: #d8131d;
+        }
     }
 
-    a:hover{
-        color: red;
+    .book_block{
+        position: relative;
+
+        a{
+            color: #000;
+            text-decoration: underline;
+        }
+
+        a:hover{
+            color: red;
+        }
+
+        a.in_favourites{
+            color: #d8131d;
+        }
+
+        .favourite_link{
+            color: #000;
+            text-decoration: none;
+            position: absolute;
+            left: -50px;
+            top: 50%;
+            margin-top: -16px;
+            font-weight: 400;
+            font-family: 'Oswald', sans-serif;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .favourite_link:hover{
+            color: red;
+            text-decoration: underline;
+        }
+
+        .favourite_link.in_favourites{
+            color: #842136;
+        }
     }
 }
 
@@ -468,6 +555,50 @@ header{
     .book_text{
         margin: 1rem 0;
 
+        /*Картинки в этом блоке*/
+        .floatnone{
+            text-align: center;
+        }
+
+        /*Текста по центру*/
+        div[align="center"]{
+            p{
+                text-align: center;
+            }
+        }
+
+        /*Таблица*/
+        table.standard, table.wide {
+            border: 1px solid #d8d8d8;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        table.standard td, table.wide td {
+            border: 1px solid #d8d8d8;
+            padding-left: 0.3em;
+            padding-right: 0.3em;
+            background-color: #FFFFFF;
+          }
+
+        .small_table_center{
+            display: grid;
+            
+            table{
+                justify-self: center;
+            }
+        }
+
+        /*Стих*/
+        .verse p{
+            text-indent: 0 !important;
+        }
+
+        /*Примечания
+        .references-small{
+            border-top: 1px solid #d8d8d8;
+        }*/
+
         p{
             text-align: justify;
             text-indent: 1rem;
@@ -497,6 +628,37 @@ header{
 
         .references-small li a:hover{
             color: #842136;
+        }
+    }
+}
+
+
+.content_block .favourites_here{
+    margin-top: 1rem;
+
+    .author_fullname_title{
+        font-size: 25px;
+        color: #000;
+    }
+
+    .author_fullname_title:hover{
+        color: red;
+    }
+
+    .block_author_indent{    
+        .book_links{
+            margin-left: 2rem;
+
+            .book_block{
+                a{
+                    color: #000;
+                }
+
+                a:hover{
+                    color: red;
+                }
+            }
+            
         }
     }
 }

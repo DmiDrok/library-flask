@@ -42,12 +42,20 @@
         </nav>
 
         <div class="btns_header">
-            {% if links %}
-                <a href="{{ url_for('auth') }}" id="auth" class="{{ links[url_for('auth')] }}">Авторизация</a>
-                <a href="{{ url_for('register') }}" id="register" class="{{ links[url_for('register')] }}">Регистрация</a>
+            {% if current_user.is_authenticated %}
+                {% if links %}
+                    <a href="{{ url_for('favourites') }}" id="favourites" class="{{ links[url_for('favourites')] }}">Избранные произведения</a>
+                {% else %}
+                    <a href="{{ url_for('favourites') }}" id="favourites">Избранные произведения</a>
+                {% endif %}
             {% else %}
-                <a href="{{ url_for('auth') }}" id="auth">Авторизация</a>
-                <a href="{{ url_for('register') }}" id="register">Регистрация</a>
+                {% if links %}
+                    <a href="{{ url_for('auth') }}" id="auth" class="{{ links[url_for('auth')] }}">Авторизация</a>
+                    <a href="{{ url_for('register') }}" id="register" class="{{ links[url_for('register')] }}">Регистрация</a>
+                {% else %}
+                    <a href="{{ url_for('auth') }}" id="auth">Авторизация</a>
+                    <a href="{{ url_for('register') }}" id="register">Регистрация</a>
+                {% endif %}
             {% endif %}
         </div>
     </header>
@@ -57,6 +65,7 @@
         {% endblock %}
     </section>
 
+    
     <script src="{{ url_for('static', filename='javascript/js.js') }}"></script>
 </body>
 </html>

@@ -1,8 +1,8 @@
-from flask import Flask, render_template, g, url_for, request, flash, get_flashed_messages, redirect
+from flask import Flask, render_template, g, url_for, request, flash, get_flashed_messages, redirect, jsonify
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail, Message
-from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user
+from flask_login import LoginManager, UserMixin, login_required, login_user, logout_user, current_user
 
 
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -13,6 +13,9 @@ from forms import RegForm, AuthForm
 
 
 from itsdangerous import URLSafeTimedSerializer
+
+
+from pretty_control import Controller
 
 
 import logging
@@ -44,6 +47,8 @@ mail = Mail(app)
 
 # Логин - менеджер
 login_manager = LoginManager(app)
+login_manager.login_view = "register"
+
 @login_manager.user_loader
 def upload_user(id):
     return Users.query.filter_by(id=id).first()
@@ -93,18 +98,61 @@ class Books(db.Model):
         return f"<Book {self.id}: {self.title} - Author: {self.author_id}>"
 
 
+# Модель базы данных избранного у пользователей
+class Favourites(db.Model):
+
+    __tablename__ = "favourites"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False)
+    author_id = db.Column(db.Integer, db.ForeignKey("authors.id"), nullable=False)
+    book_id = db.Column(db.Integer, db.ForeignKey("books.id"), nullable=False)
+
+    pr_author = db.relationship("Authors", backref="authors")
+    pr_book = db.relationship("Books", backref="books")
+
+
+    def __repr__(self):
+        return f"<Favourite: {self.id} user_id: {self.user_id}, author_id: {self.author_id}, book_id: {self.book_id}>"
+
+
+# Функция отправки сообщения на почту пользователю
+def send_mail(subject: str, sender: str, recipients: list, text: str, confirm_link=None) -> bool:
+    msg = Message(subject=subject, sender=sender, recipients=recipients)
+    msg.html = text
+
+    with app.app_context():
+        mail.send(msg)
+
+
+# Действия перед каждым запросом
+@app.before_request
+def before_request():
+
+    if not hasattr(g, "Controller"):
+        g.Controller = Controller()
+
+
 # Создание папок с книгами
 def create_folders():
+
+    # Если папки с авторами нет - мы её создаём
+    if not os.path.exists(os.path.join(os.getcwd(), "static", "authors")):
+        os.mkdir(os.path.join(os.getcwd(), "static", "authors"))
+
+    # Создаём папку с автором
     for author in Authors.query.all():
         if str(author.fullname) not in os.listdir(os.path.join(os.getcwd(), "static", "authors")):
             os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname)))
 
-            for book in Books.query.filter_by(author_id=author.id).all():
+        # Создаём папку с книгой
+        for book in Books.query.filter_by(author_id=author.id).all():
+            if str(book.title) not in os.listdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname))):
                 os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)))
 
-                # Тут главы можно делать потом
-                #with open(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)), encoding="utf-8", mode="w") as file:
-                    #pass
+            # Тут главы можно делать потом
+            #with open(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)), encoding="utf-8", mode="w") as file:
+                #pass
 
 # Сделать одну из ссылок активной
 def reset_all_save_one(save):
@@ -124,6 +172,7 @@ def before_request():
         url_for("about"): "default",
         url_for("auth"): "default",
         url_for("register"): "default",
+        url_for("favourites"): "default",
     }
 
     if not hasattr(g, "links"):
@@ -180,10 +229,14 @@ def register():
                 token = Serializer.dumps(email, salt="email_confirm") # Создаём token, который вставим в url. Первый аргумент - что будет зашифровано (потом это вытащим при подтверждении)
                 confirm_link = url_for("confirm", token=token, _external=True) # Ссылка для подтверждения (её получит пользователь)
 
-                msg = Message(subject="Подтверждение почты на сайте 'БиблиоМаркс'", sender=app.config["MAIL_USERNAME"], recipients=[email])
-                msg.html = f"<h3>Подтвердите свою почту по этой ссылке: {confirm_link}</h3>"
+                # Отправляем сообщение в отдельном потоке
+                thread_send_mail = threading.Thread(target=send_mail, args=("Подтверждение почты на сайте 'Библиотека Марксизма'", app.config["MAIL_USERNAME"], [email,], f"<h3>Подтвердите свою почту пройдя по следующей ссылке: {url_for('confirm', token=token, _external=True)}</h3>", confirm_link))        
+                thread_send_mail.start()
+                thread_send_mail.join()
 
-                mail.send(msg) # Отправляем пользователю сообщение на почту
+                print(f"Сообщение отправлено на почту {email}")
+
+
 
                 flash("На вашу почту было отправлено письмо для подтверждения аккаунта", category="success")
                 return redirect(url_for("register"))
@@ -248,9 +301,16 @@ def confirm(token):
 @app.route("/author/<author_url>")
 def author_page(author_url):
     author = Authors.query.filter_by(url=author_url).first()
-    all_books = Books.query.filter_by(author_id=author.id).all()
+    all_books = Books.query.filter_by(author_id=author.id).order_by(Books.id.asc()).order_by(Books.year.asc()).all()
+    
+    favourites_books = None
+    if current_user.is_authenticated:
+        favourites_books = Favourites.query.with_entities(Favourites.book_id).filter_by(user_id=current_user.id).all() if current_user.is_authenticated else None
+        favourites_books = [x[0] for x in favourites_books]
+        print(favourites_books)
 
-    return render_template("author.html", author=author, all_books=all_books)
+
+    return render_template("author.html", author=author, all_books=all_books, favourites_books=favourites_books)
 
 
 # Обработчик страницы книги (на которой её главы и прочее)
@@ -259,11 +319,10 @@ def book_page(author_url, book_url):
     author = Authors.query.filter_by(url=author_url).first()
     book = Books.query.filter_by(url=book_url).first()
 
-    chapters = []
-    for chapter in os.listdir(os.path.join(app.root_path, "static", "authors", str(author.fullname), str(book.title))):
-        chapters.append(chapter)
+    chapters = g.Controller.get_chapters(author_fullname=author.fullname, book_title=book.title)
 
     return render_template("book.html", author=author, book=book, chapters=chapters)
+
 
 # Обработчик страницы с главой книги
 @app.route("/author/<author_url>/book/<path:book_url>/<path:chapter_active>")
@@ -271,17 +330,71 @@ def book_chapter_page(author_url, book_url, chapter_active):
     author = Authors.query.filter_by(url=author_url).first()
     book = Books.query.filter_by(url=book_url).first()
 
-    chapters = []
-    for chap in os.listdir(os.path.join(app.root_path, "static", "authors", str(author.fullname), str(book.title))):
-        chapters.append(chap)
-
-    book_text = ""
-    with open(os.path.join(os.path.join(app.root_path, "static", "authors", str(author.fullname), str(book.title), str(chapter_active))), encoding="utf-8", mode="r") as html_file:
-        book_text = html_file.read()
-    print(book_text)
-
+    chapters = g.Controller.get_chapters(author_fullname=author.fullname, book_title=book.title)
+    book_text = g.Controller.get_book_text(author_fullname=author.fullname, book_title=book.title, chapter_active=chapter_active)
+    
+    
     return render_template("book_content.html", author=author, book=book, chapter_active=chapter_active, chapters=chapters, book_text=book_text)
+
+
+# Обработчик страницы с избранными произведениями
+@app.route("/favourites")
+@login_required
+def favourites():
+    reset_all_save_one(url_for("favourites"))
+
+
+    all_favourites = Favourites.query.filter_by(user_id=current_user.id).all()
+    
+    all_books = {}
+
+    for author in all_favourites:
+        all_books[author.pr_author] = []
+
+    for i in range(len(all_favourites)):
+        for j in all_books:
+            if all_favourites[i].pr_author == j:
+                all_books[j].append(all_favourites[i])
+
+    
+    print(all_favourites)
+    
+
+    return render_template("favourites.html", links=g.links, all_favourites=all_books)
+
+
+# Принимаем избранное и кладём в БД
+@app.route("/favourites/upload", methods=["POST", "GET"])
+def favourites_upload():
+    response = request.json
+    content_add = response.get("add").get("content")
+    content_remove = response.get("remove").get("content")
+    author_fullname = response.get("author")
+
+
+    # Алгорит добавления в избранное
+    for book in content_add:
+        b = Favourites(
+            user_id=current_user.id,
+            author_id=Authors.query.filter_by(fullname=author_fullname).first().id,
+            book_id=Books.query.filter_by(title=book).first().id
+        )
+
+        db.session.add(b)
+        db.session.commit()
+
+
+
+    # Алгоритм удаления из избранного
+    for book in content_remove:
+        Favourites.query.filter_by(book_id=Books.query.filter_by(title=book).first().id).delete()
+
+    db.session.commit()
+
+
+    return f"{request.json}"
+
 
 # Точка входа
 if __name__ == "__main__":
-    app.run(host="localhost", port=5005, debug=True)
+    app.run(debug=True)

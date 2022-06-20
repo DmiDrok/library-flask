@@ -12,10 +12,113 @@
 
 <div class="books_here">
     {% for book in all_books %}
-        <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}" class="book_block">
-            <p>{{ book.title }} ({{ book.year }} г.)</p>
-        </a>
+        <div class="book_block">
+            {% if current_user.is_authenticated %}
+                {% if book.id in favourites_books %}
+                    <p class="favourite_link remove in_favourites">-</p>
+                    <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}" class="in_favourites">
+                        {{ book.title }} ({{ book.year }} г.)
+                    </a>
+                {% else %}
+                    <p class="favourite_link add">+</p>
+                    <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">
+                        {{ book.title }} ({{ book.year }} г.)
+                    </a>
+                {% endif %}
+            {% else %}
+                <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">
+                    {{ book.title }} ({{ book.year }} г.)
+                </a>
+            {% endif %}
+        </div>
     {% endfor %}
+
+    {% if current_user.is_authenticated %}
+        <div class="btn_save"> 
+            <button id="save_favourites">
+                Обновить избранное
+            </button>
+        </div>
+    {% endif %}
 </div>
+
+<script>
+try{
+    let favourites_all = [];
+    let favourites_add = [];
+    let favourites_remove = []
+    let allBtns = document.querySelectorAll(".book_block .favourite_link");
+
+
+    //Логика на добавление в массив избранных произведений
+    for (let btn of allBtns){
+        btn.onclick = function(){
+            nextElement = btn.nextElementSibling.textContent.trim().slice(0, btn.nextElementSibling.textContent.trim().length - 10);
+
+            if (btn.classList.contains("add")){
+                favourites_add.push(nextElement);
+                favourites_remove = favourites_remove.filter(function(value) {return value != nextElement});
+         
+                btn.innerHTML = "-";
+                btn.nextElementSibling.classList.add("in_favourites");
+                btn.classList.add("in_favourites");
+
+                btn.classList.remove("add");
+                btn.classList.add("remove");
+            }
+            else{      
+                favourites_add = favourites_add.filter(function(value) {return value != nextElement});
+                favourites_remove.push(nextElement);
+
+
+                btn.innerHTML = "+";
+                btn.nextElementSibling.classList.remove("in_favourites");
+                btn.classList.remove("in_favourites");
+
+                btn.classList.remove("remove");
+                btn.classList.add("add");
+            }
+
+            console.log(favourites_add);
+            console.log(favourites_remove);
+        }
+    }
+
+
+    //Логика AJAX - запроса
+    const requestURL = "{{ url_for('favourites_upload', _external=True) }}";
+    const xhr = new XMLHttpRequest();
+    const btnSave = document.querySelector("#save_favourites");
+    const author = "{{ author.fullname }}";
+    let contentToSend;
+
+
+
+    btnSave.onclick = () => {
+        contentToSend = {
+            add: {
+                content: favourites_add 
+            },
+            
+            remove: {
+                content: favourites_remove
+            },
+
+            author: author
+        };
+        xhr.open("POST", requestURL);
+        xhr.onload = () => {
+            console.log(xhr.response);
+        }
+        xhr.setRequestHeader("Content-Type", "application/json");
+
+        xhr.send(JSON.stringify(contentToSend));
+    }
+
+}
+catch(err){
+    console.error(err);
+}
+</script>
 
 {% endblock %}

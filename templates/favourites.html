@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="title_content">
+    <h2>Избранные произведения</h2>
+</div>
+
+<div class="favourites_here">
+    {% for author in all_favourites %}
+        <div class="block_author_indent">
+            <a href="{{ url_for('author_page', author_url=author.url) }}" class="author_fullname_title">{{ author.fullname }}</a>
+            <div class="book_links">
+                {% for book in all_favourites[author] %}
+                    <div class="book_block">
+                        <a href="{{ url_for('book_page', author_url=author.url, book_url=book.pr_book.url) }}" class="book_link">{{ book.pr_book.title }}</a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

@@ -1,3 +1,4 @@
+@charset "UTF-8";
 @import url("https://fonts.googleapis.com/css2?family=Charis+SIL:ital,wght@0,400;0,700;1,400;1,700&family=Oswald:wght@200;300;400;500;600;700&display=swap");
 /*
     font-family: 'Charis SIL', serif;
@@ -12,13 +13,14 @@
 body {
   display: grid;
   font-family: "Charis SIL", serif;
-  min-width: 653px;
+  min-width: 670px;
   overflow-x: hidden;
 }
 body .content_block {
-  width: 80%;
+  min-width: 80%;
+  max-width: 90%;
   justify-self: center;
-  margin-top: 2rem;
+  margin: 2rem 0 1rem 0;
 }
 body .content_block h2:first-child {
   font-size: 30px;
@@ -68,6 +70,7 @@ body .content_block .flash_msgs_here p.success {
   color: #fff;
   background-color: #2caa50;
   border: 1px solid #141414;
+  padding: 5px 10px;
 }
 body .content_block .flash_msgs_here #close_flash_msg {
   position: absolute;
@@ -237,7 +240,7 @@ header .btns_header #auth.active::before {
 header .btns_header #auth.active {
   color: #000;
 }
-header .btns_header #register.active::before {
+header .btns_header #register.active::before, header .btns_header #favourites.active::before {
   width: 100%;
 }
 header .btns_header a:hover::before {
@@ -253,12 +256,12 @@ header .btns_header #auth:hover {
 header .btns_header #auth::before {
   background-color: #fff;
 }
-header .btns_header #register {
+header .btns_header #register, header .btns_header #favourites {
   border: 2px solid #ed315a;
   box-shadow: 0 0 1px 1px rgb(237, 49, 90);
   z-index: 100;
 }
-header .btns_header #register::before {
+header .btns_header #register::before, header .btns_header #favourites::before {
   background-color: #ed315a;
 }
 header a {
@@ -344,13 +347,84 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 .content_block .books_here {
   margin-top: 1rem;
   font-size: 18px;
+  position: relative;
+  /*Кнопка сохранения в избранное*/
 }
-.content_block .books_here a {
+.content_block .books_here .btn_save {
+  position: absolute;
+  right: 15px;
+  top: 15px;
+}
+.content_block .books_here .btn_save #save_favourites {
+  font-size: 15px;
+  padding: 5px;
+  background: none;
+  border: 2px solid #ed315a;
+  box-shadow: 0 0 1px 1px rgba(237, 49, 90, 0.1);
+  font-size: 18px;
+  font-family: "Charis SIL", serif;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 2px;
+  position: relative;
+  transition-duration: 0.2s;
+  z-index: 100;
+}
+.content_block .books_here .btn_save #save_favourites::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 100%;
+  width: 0;
+  background-color: #ed315a;
+  transition-duration: 0.3s;
+  display: block;
+  z-index: -1;
+}
+.content_block .books_here .btn_save #save_favourites:hover {
+  color: #fff;
+}
+.content_block .books_here .btn_save #save_favourites:hover::before {
+  width: 100%;
+}
+.content_block .books_here .btn_save #save_favourites:active {
+  border-color: 2px solid #d8131d;
+}
+.content_block .books_here .btn_save #save_favourites:active::before {
+  background-color: #d8131d;
+}
+.content_block .books_here .book_block {
+  position: relative;
+}
+.content_block .books_here .book_block a {
   color: #000;
   text-decoration: underline;
 }
-.content_block .books_here a:hover {
+.content_block .books_here .book_block a:hover {
   color: red;
+}
+.content_block .books_here .book_block a.in_favourites {
+  color: #d8131d;
+}
+.content_block .books_here .book_block .favourite_link {
+  color: #000;
+  text-decoration: none;
+  position: absolute;
+  left: -50px;
+  top: 50%;
+  margin-top: -16px;
+  font-weight: 400;
+  font-family: "Oswald", sans-serif;
+  font-size: 25px;
+  cursor: pointer;
+}
+.content_block .books_here .book_block .favourite_link:hover {
+  color: red;
+  text-decoration: underline;
+}
+.content_block .books_here .book_block .favourite_link.in_favourites {
+  color: #842136;
 }
 
 .content_block .chapters_here {
@@ -388,6 +462,40 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 }
 .content_block .book_text {
   margin: 1rem 0;
+  /*Картинки в этом блоке*/
+  /*Текста по центру*/
+  /*Таблица*/
+  /*Стих*/
+  /*Примечания
+  .references-small{
+      border-top: 1px solid #d8d8d8;
+  }*/
+}
+.content_block .book_text .floatnone {
+  text-align: center;
+}
+.content_block .book_text div[align=center] p {
+  text-align: center;
+}
+.content_block .book_text table.standard, .content_block .book_text table.wide {
+  border: 1px solid #d8d8d8;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.content_block .book_text table.standard td, .content_block .book_text table.wide td {
+  border: 1px solid #d8d8d8;
+  padding-left: 0.3em;
+  padding-right: 0.3em;
+  background-color: #FFFFFF;
+}
+.content_block .book_text .small_table_center {
+  display: grid;
+}
+.content_block .book_text .small_table_center table {
+  justify-self: center;
+}
+.content_block .book_text .verse p {
+  text-indent: 0 !important;
 }
 .content_block .book_text p {
   text-align: justify;
@@ -411,6 +519,26 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 }
 .content_block .book_text .references-small li a:hover {
   color: #842136;
+}
+
+.content_block .favourites_here {
+  margin-top: 1rem;
+}
+.content_block .favourites_here .author_fullname_title {
+  font-size: 25px;
+  color: #000;
+}
+.content_block .favourites_here .author_fullname_title:hover {
+  color: red;
+}
+.content_block .favourites_here .block_author_indent .book_links {
+  margin-left: 2rem;
+}
+.content_block .favourites_here .block_author_indent .book_links .book_block a {
+  color: #000;
+}
+.content_block .favourites_here .block_author_indent .book_links .book_block a:hover {
+  color: red;
 }
 
 @media (max-width: 1010px) {
