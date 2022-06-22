@@ -5,6 +5,7 @@
 */
 
 $color_btn: #d8131d;
+$min-width: 700px;
 
 *{
     padding: 0;
@@ -15,7 +16,7 @@ $color_btn: #d8131d;
 body{
     display: grid;
     font-family: 'Charis SIL', serif;
-    min-width: 670px;
+    min-width: $min-width;
     overflow-x: hidden;
 
     .content_block{
@@ -49,9 +50,9 @@ body{
                 color: #000;
             }
 
-            a:not(:nth-child(1)){
+            /*a:not(:nth-child(1)){
                 margin-left: 10px;
-            }
+            }*/
 
             a:hover{
                 color: red;
@@ -197,6 +198,7 @@ header{
 
     .logo{
         grid-area: title_logo;
+        line-height: 33px;
     }
 
     .logo i{
@@ -313,6 +315,7 @@ header{
             border: 2px solid #ed315a;
             box-shadow: 0 0 1px 1px rgba(237, 49, 90, 1);
             z-index: 100;
+            white-space: nowrap;
         }
 
         #register::before, #favourites::before{
@@ -406,6 +409,10 @@ header{
         font-weight: 600;
         color: #000;
         transition-duration: .3s;
+
+        p{
+            white-space: nowrap;
+        }
     }
 
     .author_block:hover{
@@ -419,6 +426,13 @@ header{
     margin-top: 1rem;
     font-size: 18px;
     position: relative;
+
+    .title_compositions{
+        text-align: center;
+        border-bottom: 1px solid #AAAAAA;
+        margin-bottom: 1.5rem;
+        font-size: 25px;
+    }
 
     /*Кнопка сохранения в избранное*/
     .btn_save{
@@ -488,6 +502,10 @@ header{
             color: #d8131d;
         }
 
+        a.in_favourites:hover{
+            color: red;
+        }
+
         .favourite_link{
             color: #000;
             text-decoration: none;
@@ -526,6 +544,16 @@ header{
     a:hover{
         color: red;
     }
+
+    ul{
+        li.default{
+            margin-left: 0;
+        }
+
+        li.ind1{
+            margin-left: 1rem;
+        }
+    }
 }
 
 .content_block{
@@ -540,9 +568,9 @@ header{
             font-weight: bold;
         }
 
-        a:not(:first-child){
+        /*a:not(:first-child){
             margin-left: 10px;
-        }
+        }*/
 
         a:hover{
             color: red;
@@ -554,6 +582,28 @@ header{
     }
     .book_text{
         margin: 1rem 0;
+
+        /*Навигация под названием*/
+        .nav_under_title{
+            margin-bottom: 1rem;
+
+            a{
+                color: #000;
+            }
+
+            a:hover{
+                color: red;
+            }
+        }
+
+        /*Линия*/
+        hr{
+            margin-top: 1rem;
+        }
+
+        .references{
+            margin-top: 1rem;
+        }
 
         /*Картинки в этом блоке*/
         .floatnone{
@@ -568,6 +618,10 @@ header{
         }
 
         /*Таблица*/
+        table{
+            margin: 2rem 0;
+        }
+        
         table.standard, table.wide {
             border: 1px solid #d8d8d8;
             border-collapse: collapse;
@@ -605,7 +659,7 @@ header{
         }
 
         p:not(:first-child){
-            margin-top: 1.5rem;
+            margin-top: .5rem;
         }
 
         h3{
@@ -622,11 +676,11 @@ header{
             color: #842136;
         }
 
-        .references-small li a{
+        .references li a{
             color: red;
         }
 
-        .references-small li a:hover{
+        .references li a:hover{
             color: #842136;
         }
     }
@@ -688,6 +742,21 @@ header{
             & > a{
                 display: none;
             }
+        }
+    }
+
+    .content_block .authors_here{
+        grid-template-columns: repeat(3, 33%);
+    }
+
+    .book_text{
+        margin: 0 auto;
+
+        table{
+            display: block;
+            width: $min-width - 150px;
+            overflow-x: scroll;
+            margin: 0 auto !important;
         }
     }
 }

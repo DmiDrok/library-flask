@@ -5,15 +5,15 @@
 
 <div class="title_content">
     <h2 class="smaller_title">
-        <a href="{{ url_for('all_authors') }}">Все авторы</a> --> <a href="{{ url_for('author_page', author_url=author.url) }}">{{ author.fullname }}</a> --> <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">{{ book.title }}</a> --> {{ chapter_active[4:-5] }}
+        <a href="{{ url_for('all_authors') }}">Все авторы</a> → <a href="{{ url_for('author_page', author_url=author.url) }}">{{ author.fullname }}</a> → <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">{{ book.title }}</a> --> {{ chapter_active[4:-5].replace('ind1_', '') }}
     </h2>
 
     <h2 class="smaller_title navigation">
         {% for chapter in chapters %}
             {% if chapter == chapter_active %}
-            <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}" class="active">{{ chapter[4:-5] }}</a>
+                <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}" class="active">{{ chapter[4:-5].replace('ind1_', '') }}</a>
             {% else %}
-                <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5] }}</a>
+                <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5].replace('ind1_', '') }}</a>
             {% endif %}
         {% endfor %}
     </h2>
@@ -26,9 +26,9 @@
 <div class="navigation_bottom">
     {% for chapter in chapters %}
         {% if chapter == chapter_active %}
-        <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}" class="active">{{ chapter[4:-5] }}</a>
+        <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}" class="active">{{ chapter[4:-5].replace('ind1_', '') }}</a>
         {% else %}
-            <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5] }}</a>
+            <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5].replace('ind1_', '') }}</a>
         {% endif %}
     {% endfor %}
 </div>

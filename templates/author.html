@@ -6,41 +6,44 @@
 
 <div class="title_content">
     <h2 class="smaller_title">
-       <a href="{{ url_for('all_authors') }}">Все авторы</a> --> {{ author.fullname }} ({{ author.years_life }} гг.)
+       <a href="{{ url_for('all_authors') }}">Все авторы</a> → {{ author.fullname }} ({{ author.years_life }} гг.)
     </h2>
 </div>
 
-<div class="books_here">
-    {% for book in all_books %}
-        <div class="book_block">
-            {% if current_user.is_authenticated %}
-                {% if book.id in favourites_books %}
-                    <p class="favourite_link remove in_favourites">-</p>
-                    <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}" class="in_favourites">
-                        {{ book.title }} ({{ book.year }} г.)
-                    </a>
+{% if all_books %}
+    <div class="books_here">
+        <h3 class="title_compositions" id="title_books">Сочинения</h3>
+        {% for book in all_books %}
+            <div class="book_block">
+                {% if current_user.is_authenticated %}
+                    {% if book.id in favourites_books %}
+                        <p class="favourite_link remove in_favourites">-</p>
+                        <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}" class="in_favourites">
+                            {{ book.title }} ({{ book.year }} г.)
+                        </a>
+                    {% else %}
+                        <p class="favourite_link add">+</p>
+                        <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">
+                            {{ book.title }} ({{ book.year }} г.)
+                        </a>
+                    {% endif %}
                 {% else %}
-                    <p class="favourite_link add">+</p>
                     <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">
                         {{ book.title }} ({{ book.year }} г.)
                     </a>
                 {% endif %}
-            {% else %}
-                <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">
-                    {{ book.title }} ({{ book.year }} г.)
-                </a>
-            {% endif %}
-        </div>
-    {% endfor %}
+            </div>
+        {% endfor %}
 
-    {% if current_user.is_authenticated %}
-        <div class="btn_save"> 
-            <button id="save_favourites">
-                Обновить избранное
-            </button>
-        </div>
-    {% endif %}
-</div>
+        <!--{% if current_user.is_authenticated %}
+            <div class="btn_save"> 
+                <button id="save_favourites">
+                    Обновить избранное
+                </button>
+            </div>
+        {% endif %}-->
+    </div>
+{% endif %}
 
 <script>
 try{
@@ -81,39 +84,39 @@ try{
 
             console.log(favourites_add);
             console.log(favourites_remove);
+
+            //Логика AJAX - запроса
+            const requestURL = "{{ url_for('favourites_upload', _external=True) }}";
+            const xhr = new XMLHttpRequest();
+            const btnSave = document.querySelector("#save_favourites");
+            const author = "{{ author.fullname }}";
+            let contentToSend;
+
+
+
+            //btnSave.onclick = () => {
+            contentToSend = {
+                add: {
+                    content: favourites_add 
+                },
+                
+                remove: {
+                    content: favourites_remove
+                },
+
+                author: author
+            };
+            xhr.open("POST", requestURL);
+            xhr.onload = () => {
+                console.log(xhr.response);
+            }
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.send(JSON.stringify(contentToSend));
+            //}
         }
     }
 
-
-    //Логика AJAX - запроса
-    const requestURL = "{{ url_for('favourites_upload', _external=True) }}";
-    const xhr = new XMLHttpRequest();
-    const btnSave = document.querySelector("#save_favourites");
-    const author = "{{ author.fullname }}";
-    let contentToSend;
-
-
-
-    btnSave.onclick = () => {
-        contentToSend = {
-            add: {
-                content: favourites_add 
-            },
-            
-            remove: {
-                content: favourites_remove
-            },
-
-            author: author
-        };
-        xhr.open("POST", requestURL);
-        xhr.onload = () => {
-            console.log(xhr.response);
-        }
-        xhr.setRequestHeader("Content-Type", "application/json");
-
-        xhr.send(JSON.stringify(contentToSend));
-    }
 
 }
 catch(err){

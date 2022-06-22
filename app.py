@@ -25,7 +25,7 @@ import re
 
 
 # Настройка логгирования
-logging.basicConfig(filename="logs.log", level=logging.ERROR)
+# logging.basicConfig(filename="logs.log", level=logging.ERROR)
 
 
 # WSGI - приложение
@@ -92,6 +92,8 @@ class Books(db.Model):
     author_id = db.Column(db.Integer, db.ForeignKey("authors.id"), nullable=False)
     url = db.Column(db.Text, unique=True, nullable=False)
     year = db.Column(db.Integer)
+    content = db.Column(db.Text)
+    # type = db.Column(db.Text)
 
 
     def __repr__(self):
@@ -147,9 +149,12 @@ def create_folders():
 
         # Создаём папку с книгой
         for book in Books.query.filter_by(author_id=author.id).all():
-            if str(book.title) not in os.listdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname))):
-                os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)))
-
+            try:
+                if str(book.title) not in os.listdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname))):
+                    os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)))
+            except Exception as err:
+                print(f"---Ошибка при создании папки книги с именем {book.title}---")
+                #print(book.title)
             # Тут главы можно делать потом
             #with open(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)), encoding="utf-8", mode="w") as file:
                 #pass
@@ -243,8 +248,8 @@ def register():
             else:
                 flash("Такая почта уже использована на сайте!", category="error")
 
-        else:
-            logging.error(msg=f"Пользователь {request.remote_addr} допустил ошибку при регистрации.")
+        #else:
+            #logging.error(msg=f"Пользователь {request.remote_addr} допустил ошибку при регистрации.")
             #flash("Ошибка при заполнении формы...", category="error")
 
 
@@ -287,7 +292,8 @@ def confirm(token):
     try:
         email = Serializer.loads(token, salt="email_confirm", max_age=100) # Достаём из токена email, который шифровали
     except Exception as err:
-        logging.error(f"<У пользователя {request.remote_addr} произошла ошибка при подтверждении учётной записи>")
+        print(err)
+        # logging.error(f"<У пользователя {request.remote_addr} произошла ошибка при подтверждении учётной записи>")
 
     user = Users.query.filter_by(email=email).first()
     user.confirm = True
@@ -320,8 +326,11 @@ def book_page(author_url, book_url):
     book = Books.query.filter_by(url=book_url).first()
 
     chapters = g.Controller.get_chapters(author_fullname=author.fullname, book_title=book.title)
+    book_begin_text = Books.query.filter_by(title=book.title).first().content
 
-    return render_template("book.html", author=author, book=book, chapters=chapters)
+    print(book_begin_text)
+
+    return render_template("book.html", author=author, book=book, chapters=chapters, book_begin_text=book_begin_text)
 
 
 # Обработчик страницы с главой книги
@@ -330,7 +339,7 @@ def book_chapter_page(author_url, book_url, chapter_active):
     author = Authors.query.filter_by(url=author_url).first()
     book = Books.query.filter_by(url=book_url).first()
 
-    chapters = g.Controller.get_chapters(author_fullname=author.fullname, book_title=book.title)
+    chapters = g.Controller.get_chapters_navigation(author_fullname=author.fullname, book_title=book.title)
     book_text = g.Controller.get_book_text(author_fullname=author.fullname, book_title=book.title, chapter_active=chapter_active)
     
     
@@ -371,17 +380,19 @@ def favourites_upload():
     content_remove = response.get("remove").get("content")
     author_fullname = response.get("author")
 
+    all_favourites_books = [book.pr_book.title for book in Favourites.query.filter_by(user_id=current_user.id).all()]
 
     # Алгорит добавления в избранное
     for book in content_add:
-        b = Favourites(
-            user_id=current_user.id,
-            author_id=Authors.query.filter_by(fullname=author_fullname).first().id,
-            book_id=Books.query.filter_by(title=book).first().id
-        )
+        if book not in all_favourites_books:     
+            b = Favourites(
+                user_id=current_user.id,
+                author_id=Authors.query.filter_by(fullname=author_fullname).first().id,
+                book_id=Books.query.filter_by(title=book).first().id
+            )
 
-        db.session.add(b)
-        db.session.commit()
+            db.session.add(b)
+            db.session.commit()
 
 
 
@@ -392,7 +403,7 @@ def favourites_upload():
     db.session.commit()
 
 
-    return f"{request.json}"
+    return f"{all_favourites_books}"
 
 
 # Точка входа

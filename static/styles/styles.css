@@ -13,7 +13,7 @@
 body {
   display: grid;
   font-family: "Charis SIL", serif;
-  min-width: 670px;
+  min-width: 700px;
   overflow-x: hidden;
 }
 body .content_block {
@@ -38,12 +38,12 @@ body .content_block h2.smaller_title {
 }
 body .content_block h2.smaller_title.navigation {
   margin-top: 1rem;
+  /*a:not(:nth-child(1)){
+      margin-left: 10px;
+  }*/
 }
 body .content_block h2.smaller_title.navigation a {
   color: #000;
-}
-body .content_block h2.smaller_title.navigation a:not(:nth-child(1)) {
-  margin-left: 10px;
 }
 body .content_block h2.smaller_title.navigation a:hover {
   color: red;
@@ -163,6 +163,7 @@ header {
 }
 header .logo {
   grid-area: title_logo;
+  line-height: 33px;
 }
 header .logo i {
   color: #ed315a;
@@ -260,6 +261,7 @@ header .btns_header #register, header .btns_header #favourites {
   border: 2px solid #ed315a;
   box-shadow: 0 0 1px 1px rgb(237, 49, 90);
   z-index: 100;
+  white-space: nowrap;
 }
 header .btns_header #register::before, header .btns_header #favourites::before {
   background-color: #ed315a;
@@ -338,6 +340,9 @@ header .burger_menu:hover .burger_line:nth-child(3) {
   color: #000;
   transition-duration: 0.3s;
 }
+.content_block .authors_here .author_block p {
+  white-space: nowrap;
+}
 .content_block .authors_here .author_block:hover {
   background-color: rgba(237, 49, 90, 0.7);
   border: 2px solid rgba(237, 49, 90, 0.7);
@@ -349,6 +354,12 @@ header .burger_menu:hover .burger_line:nth-child(3) {
   font-size: 18px;
   position: relative;
   /*Кнопка сохранения в избранное*/
+}
+.content_block .books_here .title_compositions {
+  text-align: center;
+  border-bottom: 1px solid #AAAAAA;
+  margin-bottom: 1.5rem;
+  font-size: 25px;
 }
 .content_block .books_here .btn_save {
   position: absolute;
@@ -407,6 +418,9 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 .content_block .books_here .book_block a.in_favourites {
   color: #d8131d;
 }
+.content_block .books_here .book_block a.in_favourites:hover {
+  color: red;
+}
 .content_block .books_here .book_block .favourite_link {
   color: #000;
   text-decoration: none;
@@ -440,19 +454,25 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 .content_block .chapters_here a:hover {
   color: red;
 }
+.content_block .chapters_here ul li.default {
+  margin-left: 0;
+}
+.content_block .chapters_here ul li.ind1 {
+  margin-left: 1rem;
+}
 
 .content_block .navigation_bottom {
   padding-top: 1rem;
   border-top: 2px solid rgba(50, 50, 50, 0.5);
   margin: 2rem 0;
+  /*a:not(:first-child){
+      margin-left: 10px;
+  }*/
 }
 .content_block .navigation_bottom a {
   font-size: 20px;
   color: #000;
   font-weight: bold;
-}
-.content_block .navigation_bottom a:not(:first-child) {
-  margin-left: 10px;
 }
 .content_block .navigation_bottom a:hover {
   color: red;
@@ -462,6 +482,8 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 }
 .content_block .book_text {
   margin: 1rem 0;
+  /*Навигация под названием*/
+  /*Линия*/
   /*Картинки в этом блоке*/
   /*Текста по центру*/
   /*Таблица*/
@@ -471,11 +493,29 @@ header .burger_menu:hover .burger_line:nth-child(3) {
       border-top: 1px solid #d8d8d8;
   }*/
 }
+.content_block .book_text .nav_under_title {
+  margin-bottom: 1rem;
+}
+.content_block .book_text .nav_under_title a {
+  color: #000;
+}
+.content_block .book_text .nav_under_title a:hover {
+  color: red;
+}
+.content_block .book_text hr {
+  margin-top: 1rem;
+}
+.content_block .book_text .references {
+  margin-top: 1rem;
+}
 .content_block .book_text .floatnone {
   text-align: center;
 }
 .content_block .book_text div[align=center] p {
   text-align: center;
+}
+.content_block .book_text table {
+  margin: 2rem 0;
 }
 .content_block .book_text table.standard, .content_block .book_text table.wide {
   border: 1px solid #d8d8d8;
@@ -502,7 +542,7 @@ header .burger_menu:hover .burger_line:nth-child(3) {
   text-indent: 1rem;
 }
 .content_block .book_text p:not(:first-child) {
-  margin-top: 1.5rem;
+  margin-top: 0.5rem;
 }
 .content_block .book_text h3 {
   font-size: 40px;
@@ -514,10 +554,10 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 .content_block .book_text sup:hover a {
   color: #842136;
 }
-.content_block .book_text .references-small li a {
+.content_block .book_text .references li a {
   color: red;
 }
-.content_block .book_text .references-small li a:hover {
+.content_block .book_text .references li a:hover {
   color: #842136;
 }
 
@@ -560,5 +600,19 @@ header .burger_menu:hover .burger_line:nth-child(3) {
   }
   header nav > a {
     display: none;
+  }
+
+  .content_block .authors_here {
+    grid-template-columns: repeat(3, 33%);
+  }
+
+  .book_text {
+    margin: 0 auto;
+  }
+  .book_text table {
+    display: block;
+    width: 550px;
+    overflow-x: scroll;
+    margin: 0 auto !important;
   }
 }/*# sourceMappingURL=styles.css.map */
