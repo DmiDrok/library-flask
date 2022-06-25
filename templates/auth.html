@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+{{ super() }}
+
+
+<div class="title_content">
+    <h2>Авторизация</h2>
+</div>
+
+<div class="flash_msgs_here">
+    {% for cat, msg in get_flashed_messages(with_categories=True) %}
+        <p class="{{ cat }}">
+            {{ msg }}
+            <i id="close_flash_msg" title="Закрыть?">x</i>
+        </p>
+    {% endfor %}
+</div>
+
+<div class="form_here">
+    {% include "needful/form_auth_reg.html" %}
+</div>
+
+
+{% endblock %}

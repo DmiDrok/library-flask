@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+{{ super() }}
+
+
+<div class="title_content">
+    <h2>Подтверждение почты</h2>
+</div>
+
+<h3>Подтверждение успешно пройдено. <a href="{{ url_for('auth') }}">[Авторизация]</a></h3>
+
+
+{% endblock %}

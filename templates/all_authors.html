@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+{{ super() }}
+
+<div class="title_content">
+    <h2>Все авторы</h2>
+</div>
+
+<div class="authors_here">
+    {% for author in all_authors %}
+        <a href="{{ url_for('author_page', author_url=author.url) }}" class="author_block">
+            <p>{{ author.fullname }}</p>
+        </a>
+    {% endfor %}
+</div>
+
+{% endblock %}

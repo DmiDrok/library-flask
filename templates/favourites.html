@@ -1,0 +1,108 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+
+<div class="title_content">
+    <h2>Избранные произведения</h2>
+</div>
+
+<div class="favourites_here">
+    {% for author in all_favourites %}
+        <div class="block_author_indent">
+            <a href="{{ url_for('author_page', author_url=author.url) }}" class="author_fullname_title">{{ author.fullname }}</a>
+            <div class="book_links">
+                {% for book in all_favourites[author] %}
+                    <div class="book_block">
+                        <p class="favourite_link remove in_favourites">-</p>
+                        <a href="{{ url_for('book_page', author_url=author.url, book_url=book.pr_book.url) }}" class="book_link in_favourites">
+                            {{ book.pr_book.title }}
+                        </a>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<script>
+    try{
+        let favourites_all = [];
+        let favourites_add = [];
+        let favourites_remove = []
+        let allBtns = document.querySelectorAll(".book_block .favourite_link");
+    
+    
+        //Логика на добавление в массив избранных произведений
+        for (let btn of allBtns){
+            btn.onclick = function(){
+                nextElement = btn.nextElementSibling.text.trim();
+    
+                if (btn.classList.contains("add")){
+                    favourites_add.push(nextElement);
+                    favourites_remove = favourites_remove.filter(function(value) {return value != nextElement});
+             
+                    btn.innerHTML = "-";
+                    btn.nextElementSibling.classList.add("in_favourites");
+                    btn.classList.add("in_favourites");
+    
+                    btn.classList.remove("add");
+                    btn.classList.add("remove");
+                }
+                else{      
+                    favourites_add = favourites_add.filter(function(value) {return value != nextElement});
+                    favourites_remove.push(nextElement);
+    
+    
+                    btn.innerHTML = "+";
+                    btn.nextElementSibling.classList.remove("in_favourites");
+                    btn.classList.remove("in_favourites");
+    
+                    btn.classList.remove("remove");
+                    btn.classList.add("add");
+                }
+    
+                console.log(favourites_add);
+                console.log(favourites_remove);
+    
+                //Логика AJAX - запроса
+                const requestURL = "{{ url_for('favourites_upload', _external=True) }}";
+                const xhr = new XMLHttpRequest();
+                const btnSave = document.querySelector("#save_favourites");
+                const author = btn.closest(".block_author_indent").querySelector(".author_fullname_title").text;
+                console.log(author, typeof author)
+                let contentToSend;
+    
+    
+    
+                //btnSave.onclick = () => {
+                contentToSend = {
+                    add: {
+                        content: favourites_add 
+                    },
+                    
+                    remove: {
+                        content: favourites_remove
+                    },
+    
+                    author: author
+                };
+                xhr.open("POST", requestURL);
+                xhr.onload = () => {
+                    console.log(xhr.response);
+                }
+                xhr.setRequestHeader("Content-Type", "application/json");
+    
+                xhr.send(JSON.stringify(contentToSend));
+                //}
+            }
+        }
+    
+    
+    }
+    catch(err){
+        console.error(err);
+    }
+    </script>
+
+{% endblock %}
