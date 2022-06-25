@@ -156,10 +156,7 @@ def create_folders():
                     os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)))
             except Exception as err:
                 print(f"---Ошибка при создании папки книги с именем {book.title}---")
-                #print(book.title)
-            # Тут главы можно делать потом
-            #with open(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)), encoding="utf-8", mode="w") as file:
-                #pass
+
 
 # Сделать одну из ссылок активной
 def reset_all_save_one(save):
@@ -198,7 +195,7 @@ def index():
 def all_authors():
     reset_all_save_one(url_for("all_authors"))
 
-    all_authors = Authors.query.all()
+    all_authors = Authors.query.order_by(Authors.id.asc()).all() # Берём всех авторов по возрастанию поля id
 
     return render_template("all_authors.html", links=g.links, all_authors=all_authors)
 
@@ -337,15 +334,12 @@ def book_page(author_url, book_url):
     chapters = g.Controller.get_chapters(author_fullname=author.fullname, book_title=book.title)
     book_begin_text = Books.query.filter_by(title=book.title).first().content
 
-    print(book_begin_text)
-
     return render_template("book.html", author=author, book=book, chapters=chapters, book_begin_text=book_begin_text)
 
 
 # Обработчик страницы с главой книги
 @app.route("/author/<author_url>/book/<path:book_url>/<path:chapter_active>")
 def book_chapter_page(author_url, book_url, chapter_active):
-    print(chapter_active)
     author = Authors.query.filter_by(url=author_url).first()
     book = Books.query.filter_by(url=book_url).first()
 
@@ -374,9 +368,6 @@ def favourites():
         for j in all_books:
             if all_favourites[i].pr_author == j:
                 all_books[j].append(all_favourites[i])
-
-    
-    print(all_favourites)
     
 
     return render_template("favourites.html", links=g.links, all_favourites=all_books)
@@ -409,11 +400,6 @@ def favourites_upload():
 
     # Алгоритм удаления из избранного
     for book in content_remove:
-        print(book)
-        print(content_remove)
-        print(Books.query.filter_by(title=book).first())
-        print(Books.query.all())
-        print("---!---")
         Favourites.query.filter_by(book_id=Books.query.filter_by(title=book).first().id).delete()
 
     db.session.commit()

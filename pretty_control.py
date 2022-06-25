@@ -6,7 +6,8 @@ class Controller:
     def get_chapters(self, author_fullname: str, book_title: str) -> list:
         try:
             chapters = []
-            for chapter in os.listdir(os.path.join(os.getcwd(), "static", "authors", author_fullname, book_title)):
+            listdir = sorted(os.listdir(os.path.join(os.getcwd(), "static", "authors", author_fullname, book_title)))
+            for chapter in listdir:
                 if "ind1" in chapter: # Если отступ уровня 1
                     chapters.append({"type": "ind1", "chapter_text": chapter})
                 else: # Если отступов нет
