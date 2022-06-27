@@ -663,6 +663,17 @@ header .burger_menu:hover .burger_line:nth-child(3) {
   header {
     padding: 2rem 1rem;
   }
+
+  .biography_block {
+    grid-template-areas: "portrait" "text";
+    grid-template-columns: unset !important;
+  }
+  .biography_block .portrait_author {
+    grid-area: portrait;
+  }
+  .biography_block .biography_text {
+    grid-area: text;
+  }
 }
 @media (max-width: 940px) {
   header {

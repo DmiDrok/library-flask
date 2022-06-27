@@ -819,6 +819,22 @@ header{
     header{
         padding: 2rem 1rem;
     }
+
+    .biography_block{
+        grid-template-areas: 
+            "portrait"
+            "text"
+        ;
+        grid-template-columns: unset !important;
+
+        .portrait_author{
+            grid-area: portrait;
+        }
+
+        .biography_text{
+            grid-area: text;
+        }
+    }
 }
 
 @media (max-width: 940px){
