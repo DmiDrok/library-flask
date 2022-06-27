@@ -80,7 +80,7 @@ try{
     //Логика на добавление в массив избранных произведений
     for (let btn of allBtns){
         btn.onclick = function(){
-            nextElement = btn.nextElementSibling.text.trim().slice(0, -10);
+            nextElement = btn.nextElementSibling.text.trim();
 
             if (btn.classList.contains("add")){
                 favourites_add.push(nextElement);

@@ -395,11 +395,16 @@ def favourites():
 @app.route("/favourites/upload", methods=["POST", "GET"])
 @login_required
 def favourites_upload():
+    print("!!!!")
     response = request.json
     content_add = response.get("add").get("content")
     content_remove = response.get("remove").get("content")
     author_fullname = response.get("author")
-
+    
+    print(response)
+    print(content_add)
+    print(content_remove)
+    print(author_fullname)
     all_favourites_books = [book.pr_book.title for book in Favourites.query.filter_by(user_id=current_user.id).all()]
 
     # Алгорит добавления в избранное
