@@ -390,7 +390,14 @@ header .burger_menu:hover .burger_line:nth-child(3) {
   margin-top: 1rem;
   font-size: 18px;
   position: relative;
+  /*Год произведения*/
   /*Кнопка сохранения в избранное*/
+}
+.content_block .books_here .year_compositions {
+  margin: 1rem 0;
+  text-align: center;
+  font-weight: 700;
+  text-decoration: underline;
 }
 .content_block .books_here .btn_save {
   position: absolute;
@@ -530,6 +537,20 @@ header .burger_menu:hover .burger_line:nth-child(3) {
       border-top: 1px solid #d8d8d8;
   }*/
   /*Навигация*/
+}
+.content_block .book_text .published_block {
+  display: grid;
+  margin: 1rem 0;
+  font-size: 16px;
+}
+.content_block .book_text .published_block span {
+  justify-self: end;
+}
+.content_block .book_text blockquote {
+  margin: 2rem;
+  border-left: 4px solid #eaecf0;
+  padding: 1rem;
+  background-color: #F5F5F5;
 }
 .content_block .book_text .nav_under_title {
   margin-bottom: 1rem;

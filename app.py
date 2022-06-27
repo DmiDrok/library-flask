@@ -144,18 +144,26 @@ def create_folders():
     if not os.path.exists(os.path.join(os.getcwd(), "static", "authors")):
         os.mkdir(os.path.join(os.getcwd(), "static", "authors"))
 
-    # Создаём папку с автором
+    # Пробегаемся по каждому автору в Базе Данных
     for author in Authors.query.all():
+
+        # Создаем папку с автором
         if str(author.fullname) not in os.listdir(os.path.join(os.getcwd(), "static", "authors")):
             os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname)))
 
-        # Создаём папку с книгой
-        for book in Books.query.filter_by(author_id=author.id).all():
-            try:
-                if str(book.title) not in os.listdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname))):
-                    os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), str(book.title)))
-            except Exception as err:
-                print(f"---Ошибка при создании папки книги с именем {book.title}---")
+        # Создаём подпапки
+        for under_folder in ["Сочинения"]:
+            if under_folder not in os.listdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname))):
+                os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), under_folder))
+
+            if under_folder == "Сочинения":
+                # Создаём папку с книгой
+                for book in Books.query.filter_by(author_id=author.id).all():
+                    try:
+                        if str(book.title) not in os.listdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), under_folder)):
+                            os.mkdir(os.path.join(os.getcwd(), "static", "authors", str(author.fullname), under_folder, str(book.title)))
+                    except Exception as err:
+                        print(f"---Ошибка при создании папки книги с именем {book.title}---")
 
 
 # Сделать одну из ссылок активной
@@ -307,8 +315,18 @@ def confirm(token):
 def author_page(author_url):
     author = Authors.query.filter_by(url=author_url).first()
     biography_text = author.biography_text
-    all_books = Books.query.filter_by(author_id=author.id).order_by(Books.id.asc()).order_by(Books.year.asc()).all()
+    all_books_default = Books.query.filter_by(author_id=author.id).order_by(Books.year.asc()).order_by(Books.year.asc()).all()
     
+    all_books = {}
+    for book in all_books_default:
+        if book.year not in all_books:
+            all_books[book.year] = []
+
+        all_books[book.year].append(book)
+
+
+    print(all_books)
+
     favourites_books = None
     if current_user.is_authenticated:
         favourites_books = Favourites.query.with_entities(Favourites.book_id).filter_by(user_id=current_user.id).all() if current_user.is_authenticated else None

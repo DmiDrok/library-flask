@@ -33,26 +33,30 @@
 {% if all_books %}
     <div class="books_here">
         <h3 class="title_compositions" id="title_books">Сочинения</h3>
-        {% for book in all_books %}
-            <div class="book_block">
-                {% if current_user.is_authenticated %}
-                    {% if book.id in favourites_books %}
-                        <p class="favourite_link remove in_favourites">-</p>
-                        <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}" class="in_favourites">
-                            {{ book.title }} ({{ book.year }} г.)
-                        </a>
+        {% for year in all_books %}
+            <h3 class="year_compositions">{{ year }}</h3>
+
+            {% for book in all_books[year] %}
+                <div class="book_block">
+                    {% if current_user.is_authenticated %}
+                        {% if book.id in favourites_books %}
+                            <p class="favourite_link remove in_favourites">-</p>
+                            <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}" class="in_favourites">
+                                {{ book.title }}
+                            </a>
+                        {% else %}
+                            <p class="favourite_link add">+</p>
+                            <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">
+                                {{ book.title }}
+                            </a>
+                        {% endif %}
                     {% else %}
-                        <p class="favourite_link add">+</p>
                         <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">
-                            {{ book.title }} ({{ book.year }} г.)
+                            {{ book.title }}
                         </a>
                     {% endif %}
-                {% else %}
-                    <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">
-                        {{ book.title }} ({{ book.year }} г.)
-                    </a>
-                {% endif %}
-            </div>
+                </div>
+            {% endfor %}
         {% endfor %}
 
         <!--{% if current_user.is_authenticated %}
