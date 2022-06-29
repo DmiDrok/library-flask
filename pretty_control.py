@@ -9,10 +9,22 @@ class Controller:
             
             listdir = sorted(os.listdir(os.path.join(os.getcwd(), "static", "authors", author_fullname, "Сочинения", book_title)))
             for chapter in listdir:
-                if "ind1" in chapter: # Если отступ уровня 1
-                    chapters.append({"type": "ind1", "chapter_text": chapter})
-                else: # Если отступов нет
-                    chapters.append({"type": "default", "chapter_text": chapter})
+                # Если папка
+                if os.path.isdir(os.path.join(os.getcwd(), "static", "authors", author_fullname, "Сочинения", book_title, chapter)):
+                    if "ind1" in chapter: # Если отступ уровня 1 у папки
+                        chapters.append({"type": "ind1_dir", "chapter_text": chapter})
+                    elif "ind2" in chapter:
+                        chapters.append({"type": "ind2_dir", "chapter_text": chapter})
+                    else: # Если отступов у папки нет
+                        chapters.append({"type": "dir", "chapter_text": chapter})
+                else:
+                    # Если ind1 (отступ первого уровня )
+                    if "ind1" in chapter: # Если отступ уровня 1
+                        chapters.append({"type": "ind1", "chapter_text": chapter})
+                    elif "ind2" in chapter:
+                        chapters.append({"type": "ind2", "chapter_text": chapter})
+                    else: # Если отступов нет
+                        chapters.append({"type": "default", "chapter_text": chapter})
 
             return chapters
         except:
@@ -26,7 +38,9 @@ class Controller:
 
             listdir = sorted(os.listdir(os.path.join(os.getcwd(), "static", "authors", author_fullname, "Сочинения", book_title)))
             for chapter in listdir:
-                chapters.append(chapter)
+                # Если глава не является папкой - то добавляем её в общий список
+                if not os.path.isdir(os.path.join(os.getcwd(), "static", "authors", author_fullname, "Сочинения", book_title, chapter)):
+                    chapters.append(chapter)
 
             return chapters
         except:

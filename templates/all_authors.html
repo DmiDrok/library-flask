@@ -6,6 +6,10 @@
 
 <div class="title_content">
     <h2>Все авторы</h2>
+    <form action="{{ url_for('all_authors') }}" name="search_author" method="post">
+        <input type="text" placeholder="{% if search_value %}{{ search_value }}{% else %}Имя автора{% endif %}" name="author_name">
+        <input type="submit" name="search_author_btn" value="→">
+    </form>
 </div>
 
 <div class="authors_here">
@@ -15,5 +19,13 @@
         </a>
     {% endfor %}
 </div>
+
+
+<script>
+    // let xhr = new XMLHttpRequest();
+    // let value_name = document.forms.search_author.author_name.value;
+    // let requestUrl = "";
+
+</script>
 
 {% endblock %}

@@ -63,6 +63,29 @@ body{
             }
         }
 
+        .block_prev_next{
+            display: grid;
+            grid-template-columns: repeat(2, 50%);
+            grid-column-gap: 1.5rem;
+            margin-top: 1rem;
+            
+            a.nav_prev_next{
+                color: #000;
+            }
+
+            a.nav_prev_next:hover{
+                color: red;
+            }
+
+            a.nav_prev_next:nth-child(1){
+                justify-self: start;
+            }
+
+            a.nav_prev_next:nth-child(2){
+                justify-self: end;
+            }
+        }
+
         .flash_msgs_here{
             margin-top: 1rem;
 
@@ -431,6 +454,47 @@ header{
     }
 }
 
+.title_content{
+    position: relative;
+
+    form[name="search_author"]{
+        position: absolute;
+        right: 0;
+        top: 15px;
+        
+        input{
+            font-family: 'Charis SIL', serif;
+        }
+
+        input[type="text"]{
+            padding: 3px 10px;
+            outline: none;
+            font-size: 15px;
+            
+        }
+
+        input[type="submit"]{
+            position: absolute;
+            right: 0;
+            height: 100%;
+            cursor: pointer;
+            padding: 0 5px;
+            background-color: #fff;
+            color: #000;
+            font-weight: 900;
+            font-size: 15px;
+            border: 1px solid #000;
+            transition-duration: .3s;
+        }
+
+        input[type="submit"]:hover{
+            background-color: #d8131d;
+            color: #fff;
+        }
+    }
+    
+}
+
 .content_block .biography_here{
 
     margin-top: 1rem;
@@ -603,8 +667,12 @@ header{
             margin-left: 0;
         }
 
-        li.ind1{
+        li.ind1, li.ind1_dir{
             margin-left: 1rem;
+        }
+
+        li.ind2, li.ind2_dir{
+            margin-left: 2rem;
         }
     }
 }
@@ -777,6 +845,12 @@ header{
         .mini_chapter{
             margin: 2rem 0;
             font-size: 25px;
+            text-align: center;
+        }
+
+        .mini_mini_chapter{
+            margin: 2rem 0;
+            font-size: 20px;
             text-align: center;
         }
     }

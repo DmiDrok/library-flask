@@ -5,18 +5,36 @@
 
 <div class="title_content">
     <h2 class="smaller_title">
-        <a href="{{ url_for('all_authors') }}">Все авторы</a> → <a href="{{ url_for('author_page', author_url=author.url) }}">{{ author.fullname }}</a> → <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">{{ book.title }}</a> → {{ chapter_active[4:-5].replace('ind1_', '') }}
+        <a href="{{ url_for('all_authors') }}">Все авторы</a> → <a href="{{ url_for('author_page', author_url=author.url) }}">{{ author.fullname }}</a> → <a href="{{ url_for('book_page', author_url=author.url, book_url=book.url) }}">{{ book.title }}</a> → {{ chapter_active[4:-5].replace('ind1_', '').replace('ind2_', '') }}
     </h2>
 
-    <h2 class="smaller_title navigation">
-        {% for chapter in chapters %}
-            {% if chapter == chapter_active %}
-                <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}" class="active">{{ chapter[4:-5].replace('ind1_', '') }}</a>
-            {% else %}
-                <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5].replace('ind1_', '') }}</a>
-            {% endif %}
-        {% endfor %}
-    </h2>
+    
+        {% if show_all_chapters_in_navigation %}
+            {% for chapter in chapters %}
+                <h2 class="smaller_title navigation">
+                    {% if chapter == chapter_active %}
+                        <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}" class="active">{{ chapter[4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+                    {% else %}
+                        <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+                    {% endif %}
+                </h2>
+            {% endfor %}
+        {% else %}
+            <div class="block_prev_next">
+                {% if prev_chapter %}
+                    <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=prev_chapter) }}" class="prev_chapter nav_prev_next">← {{ prev_chapter[4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+                {% else %}
+                    <a href=""></a>
+                {% endif %}
+
+                {% if next_chapter %}
+                    <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=next_chapter) }}" class="next_chapter nav_prev_next">→ {{ next_chapter[4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+                {% else %}
+                    <a href=""></a>
+                {% endif %}
+            </div>
+        {% endif %}
+    
 </div>
 
 <div class="book_text">
@@ -24,13 +42,33 @@
 </div>
 
 <div class="navigation_bottom">
-    {% for chapter in chapters %}
-        {% if chapter == chapter_active %}
-            <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}" class="active">{{ chapter[4:-5].replace('ind1_', '') }}</a>
-        {% else %}
-            <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5].replace('ind1_', '') }}</a>
-        {% endif %}
-    {% endfor %}
+    {% if show_all_chapters_in_navigation %}
+        {% for chapter in chapters %}
+            <h2 class="smaller_title navigation">
+                {% for chapter in chapters %}
+                    {% if chapter == chapter_active %}
+                        <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}" class="active">{{ chapter[4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+                    {% else %}
+                        <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chapter) }}">{{ chapter[4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+                    {% endif %}
+                {% endfor %}
+            </h2>
+        {% endfor %}
+    {% else %}
+        <div class="block_prev_next">
+            {% if prev_chapter %}
+                <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=prev_chapter) }}" class="prev_chapter nav_prev_next">← {{ prev_chapter[4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+            {% else %}
+                <a href=""></a>
+            {% endif %}
+
+            {% if next_chapter %}
+                <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=next_chapter) }}" class="next_chapter nav_prev_next">→ {{ next_chapter[4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+            {% else %}
+                <a href=""></a>
+            {% endif %}
+        </div>
+    {% endif %}
 </div>
 
 {% endblock %}

@@ -15,9 +15,15 @@
         <ul>
             {% for chap in chapters %}
                 <li class="{{ chap['type'] }}">
-                    <div class="chapter">
-                        <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chap['chapter_text']) }}">{{ chap['chapter_text'][4:-5].replace('ind1_', '') }}</a>
-                    </div>
+                    {% if 'dir' in chap['type'] %}
+                        <div class="chapter">
+                            <p>{{ chap['chapter_text'][4::].replace('ind1_', '').replace('ind2_', '') }}</p>
+                        </div>
+                    {% else %}
+                        <div class="chapter">
+                            <a href="{{ url_for('book_chapter_page', author_url=author.url, book_url=book.url, chapter_active=chap['chapter_text']) }}">{{ chap['chapter_text'][4:-5].replace('ind1_', '').replace('ind2_', '') }}</a>
+                        </div>
+                    {% endif %}
                 </li>
             {% endfor %}
         </ul>

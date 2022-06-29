@@ -1,4 +1,4 @@
-from flask import Flask, render_template, g, url_for, request, flash, get_flashed_messages, redirect, jsonify, render_template_string, make_response
+from flask import Flask, render_template, g, url_for, request, flash, get_flashed_messages, redirect, jsonify, render_template_string, make_response, session
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from flask_mail import Mail, Message
@@ -198,14 +198,45 @@ def index():
     return render_template("index.html", links=g.links)
 
 
-# Обработчик страницы со всеми книгами
-@app.route("/all_authors")
+# Обработчик страницы со всеми авторами
+@app.route("/all_authors", methods=["GET", "POST"])
 def all_authors():
     reset_all_save_one(url_for("all_authors"))
 
     all_authors = Authors.query.order_by(Authors.id.asc()).all() # Берём всех авторов по возрастанию поля id
+    search_value = None # То, что искал пользователь. По умолчанию принимает None
 
-    return render_template("all_authors.html", links=g.links, all_authors=all_authors)
+    # Обработка поиска автора
+    if request.method == "POST":
+        search_value = request.form.get("author_name")
+        session["search_value"] = search_value
+        session["is_search"] = True
+
+        return redirect(url_for("all_authors"))
+
+    
+    # Если пользователь что-то искал на странице с авторами
+    if session.get("search_value") and session.get("is_search"):
+        author_name = session.get("search_value")
+        author_name = set(author_name.lower().split())
+
+        all_authors_temporal = Authors.query.filter_by().all()
+
+        all_authors = []
+        
+        for author in all_authors_temporal:
+            if author_name & set(author.fullname.lower().split()):
+                all_authors.append(author)
+
+        # Если список найденных авторов до сих пор пуст - ставим значение по умолчанию, т.е., всех авторов
+        if not len(all_authors):
+            all_authors = Authors.query.order_by(Authors.id.asc()).all()
+
+
+        session["is_search"] = False
+                
+        
+    return render_template("all_authors.html", links=g.links, all_authors=all_authors, search_value=search_value)
 
 
 # Обработчик страницы 'О сайте'
@@ -315,7 +346,7 @@ def confirm(token):
 def author_page(author_url):
     author = Authors.query.filter_by(url=author_url).first()
     biography_text = author.biography_text
-    all_books_default = Books.query.filter_by(author_id=author.id).order_by(Books.year.asc()).order_by(Books.year.asc()).all()
+    all_books_default = Books.query.filter_by(author_id=author.id).order_by(Books.id.asc()).order_by(Books.year.asc()).order_by(Books.year.asc()).all()
     
     all_books = {}
     for book in all_books_default:
@@ -360,12 +391,22 @@ def book_page(author_url, book_url):
 def book_chapter_page(author_url, book_url, chapter_active):
     author = Authors.query.filter_by(url=author_url).first()
     book = Books.query.filter_by(url=book_url).first()
+    show_all_chapters_in_navigation = True # Показывать все главы в навигации. По умолчанию True
+    prev_chapter = None
+    next_chapter = None
 
     chapters = g.Controller.get_chapters_navigation(author_fullname=author.fullname, book_title=book.title)
+    
+    # Если количество глав более 30 - то не показываем все главы в навигации
+    if len(chapters) > 30:
+        show_all_chapters_in_navigation = False
+        prev_chapter = chapters[chapters.index(chapter_active)-1] if chapter_active != chapters[0] else None
+        next_chapter = chapters[chapters.index(chapter_active)+1] if chapter_active != chapters[-1] else None
+
     book_text = g.Controller.get_book_text(author_fullname=author.fullname, book_title=book.title, chapter_active=chapter_active)
     book_text = render_template_string(book_text, author=author, book=book, chapters_this_book=chapters)
     
-    return render_template("book_content.html", author=author, book=book, chapter_active=chapter_active, chapters=chapters, book_text=book_text)
+    return render_template("book_content.html", author=author, book=book, chapter_active=chapter_active, chapters=chapters, book_text=book_text, show_all_chapters_in_navigation=show_all_chapters_in_navigation, prev_chapter=prev_chapter, next_chapter=next_chapter)
 
 
 # Обработчик страницы с избранными произведениями
@@ -401,10 +442,6 @@ def favourites_upload():
     content_remove = response.get("remove").get("content")
     author_fullname = response.get("author")
     
-    print(response)
-    print(content_add)
-    print(content_remove)
-    print(author_fullname)
     all_favourites_books = [book.pr_book.title for book in Favourites.query.filter_by(user_id=current_user.id).all()]
 
     # Алгорит добавления в избранное
@@ -439,6 +476,7 @@ def get_author_portrait(id):
 
     response.headers["Content-type"] = "img/jpg"
     return response
+
 
 
 # Точка входа

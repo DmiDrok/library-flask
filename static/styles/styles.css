@@ -51,6 +51,24 @@ body .content_block h2.smaller_title.navigation a:hover {
 body .content_block h2.smaller_title.navigation a.active {
   color: red;
 }
+body .content_block .block_prev_next {
+  display: grid;
+  grid-template-columns: repeat(2, 50%);
+  grid-column-gap: 1.5rem;
+  margin-top: 1rem;
+}
+body .content_block .block_prev_next a.nav_prev_next {
+  color: #000;
+}
+body .content_block .block_prev_next a.nav_prev_next:hover {
+  color: red;
+}
+body .content_block .block_prev_next a.nav_prev_next:nth-child(1) {
+  justify-self: start;
+}
+body .content_block .block_prev_next a.nav_prev_next:nth-child(2) {
+  justify-self: end;
+}
 body .content_block .flash_msgs_here {
   margin-top: 1rem;
 }
@@ -356,6 +374,40 @@ header .burger_menu:hover .burger_line:nth-child(3) {
   font-size: 25px;
 }
 
+.title_content {
+  position: relative;
+}
+.title_content form[name=search_author] {
+  position: absolute;
+  right: 0;
+  top: 15px;
+}
+.title_content form[name=search_author] input {
+  font-family: "Charis SIL", serif;
+}
+.title_content form[name=search_author] input[type=text] {
+  padding: 3px 10px;
+  outline: none;
+  font-size: 15px;
+}
+.title_content form[name=search_author] input[type=submit] {
+  position: absolute;
+  right: 0;
+  height: 100%;
+  cursor: pointer;
+  padding: 0 5px;
+  background-color: #fff;
+  color: #000;
+  font-weight: 900;
+  font-size: 15px;
+  border: 1px solid #000;
+  transition-duration: 0.3s;
+}
+.title_content form[name=search_author] input[type=submit]:hover {
+  background-color: #d8131d;
+  color: #fff;
+}
+
 .content_block .biography_here {
   margin-top: 1rem;
 }
@@ -501,8 +553,11 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 .content_block .chapters_here ul li.default {
   margin-left: 0;
 }
-.content_block .chapters_here ul li.ind1 {
+.content_block .chapters_here ul li.ind1, .content_block .chapters_here ul li.ind1_dir {
   margin-left: 1rem;
+}
+.content_block .chapters_here ul li.ind2, .content_block .chapters_here ul li.ind2_dir {
+  margin-left: 2rem;
 }
 
 .content_block .navigation_bottom {
@@ -635,6 +690,11 @@ header .burger_menu:hover .burger_line:nth-child(3) {
 .content_block .book_text .mini_chapter {
   margin: 2rem 0;
   font-size: 25px;
+  text-align: center;
+}
+.content_block .book_text .mini_mini_chapter {
+  margin: 2rem 0;
+  font-size: 20px;
   text-align: center;
 }
 
